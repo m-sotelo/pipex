@@ -6,7 +6,7 @@
 /*   By: msotelo- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/09 12:56:15 by msotelo-          #+#    #+#             */
-/*   Updated: 2022/03/16 11:59:44 by msotelo-         ###   ########.fr       */
+/*   Updated: 2022/03/16 18:14:24 by msotelo-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "pipex.h"
@@ -44,7 +44,7 @@ char	*find_path(char *cmd, char **envp)
 	int		i;
 
 	i = 0;
-	while(ft_strnstr(envp[i],"PATH",4))
+	while(ft_strnstr(envp[i],"PATH",4) == 0)
 		i++;
 	posible_paths = ft_split(envp[i] + 5, ':');
 	i = 0;
@@ -73,7 +73,7 @@ void	execute(char *cmd, char **envp, t_data *data)
 	char	**cmd_exec;
 
 	cmd_exec = ft_split(cmd, ' ');
-	data->path = find_path(cmd, envp);
+	data->path = find_path(cmd_exec[0], envp);
 	if (data->path == NULL)
 		exit(0);
 	i = execve(data->path, cmd_exec, envp);
