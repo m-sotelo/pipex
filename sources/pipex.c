@@ -6,7 +6,7 @@
 /*   By: msotelo- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 15:07:51 by msotelo-          #+#    #+#             */
-/*   Updated: 2022/03/09 14:45:52 by msotelo-         ###   ########.fr       */
+/*   Updated: 2022/03/16 13:41:44 by msotelo-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "pipex.h"
@@ -21,23 +21,25 @@ int	check_entry(int argc)
 
 void	child_process(char **argv, t_data *data, char **envp)
 {
-	int		i;
-	int		k;
+//	int		i;
+//	int		k;
 
 	data->buf = (char *)malloc(sizeof(char));
 	data->res = (char *)malloc(sizeof(char));
 	close(data->fd[0]);
 	data->files[0] = open(argv[1], O_RDONLY);
-	i = read(data->files[0], data->res, 1);
-	k = 0;
-	while (i != 0)
-	{
-		i = read(data->files[0], data->buf, 1);
-		data->res = ft_strjoin(data->res, data->buf);
-		k++;
-	}	
-	write(data->fd[1], data->res, k);
+	dup2(data->files[0], STDIN_FILENO);
+	dup2(data->fd[1], 1);
 	execute(argv[2], envp, data);
+//	i = read(data->files[0], data->res, 1);
+//	k = 0;
+//	while (i != 0)
+//	{
+//		i = read(data->files[0], data->buf, 1);
+//		data->res = ft_strjoin(data->res, data->buf);
+//		k++;
+//	}	
+//	write(data->fd[1], data->res, k);
 	free_data(data, 0);
 	close_data(data, 0);
 	return ;
@@ -45,23 +47,25 @@ void	child_process(char **argv, t_data *data, char **envp)
 
 void	father_process(char **argv, t_data *data, char **envp)
 {
-	int		i;
-	int		k;
+//	int		i;
+//	int		k;
 
 	data->buf = (char *)malloc(sizeof(char));
 	data->res = (char *)malloc(sizeof(char));
 	close(data->fd[1]);
 	data->files[1] = open(argv[4], O_RDWR | O_CREAT | O_TRUNC, 0777);
-	i = read(data->fd[0], data->res, 1);
-	k = 0;
-	while (i != 0)
-	{
-		i = read(data->fd[0], data->buf, 1);
-		data->res = ft_strjoin(data->res, data->buf);
-		k++;
-	}
-	write(data->files[1], data->res, k);
+	dup2(data->files[1], STDOUT_FILENO);
+	dup2(data->fd[0], 0);
 	execute(argv[3], envp, data);
+//	i = read(data->fd[0], data->res, 1);
+//	k = 0;
+//	while (i != 0)
+//	{
+//		i = read(data->fd[0], data->buf, 1);
+//		data->res = ft_strjoin(data->res, data->buf);
+//		k++;
+//	}
+//	write(data->files[1], data->res, k);
 	free_data(data, 0);
 	close_data(data, 1);
 	return ;
