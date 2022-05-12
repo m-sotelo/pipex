@@ -6,7 +6,7 @@
 /*   By: msotelo- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 15:07:51 by msotelo-          #+#    #+#             */
-/*   Updated: 2022/03/18 16:29:22 by msotelo-         ###   ########.fr       */
+/*   Updated: 2022/05/12 19:53:59 by msotelo-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "pipex.h"
@@ -30,7 +30,6 @@ void	child_process(char **argv, t_data *data, char **envp)
 {
 	close(data->fd[0]);
 	dup2(data->fd[1], 1);
-	close(data->fd[1]);
 	data->files[0] = open(argv[1], O_RDONLY);
 	if (data->files[0] == -1)
 	{
@@ -39,6 +38,7 @@ void	child_process(char **argv, t_data *data, char **envp)
 	}
 	dup2(data->files[0], 0);
 	execute(argv[2], envp, data);
+	close(data->fd[1]);
 	close(data->files[0]);
 	return ;
 }

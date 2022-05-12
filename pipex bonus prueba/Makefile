@@ -2,7 +2,8 @@ NAME := pipex
 LIBFT_NAME = libft.a
 
 SRCS =  ./sources/pipex_bonus.c  \
-		./sources/utils_bonus.c
+		./sources/utils_bonus.c	\
+		./sources/process_bonus.c
 
 OBJS = ${SRCS:.c=.o}
 

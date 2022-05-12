@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils_bonus.c                                      :+:      :+:    :+:   */
+/*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: msotelo- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/09 12:56:15 by msotelo-          #+#    #+#             */
-/*   Updated: 2022/03/18 17:34:12 by msotelo-         ###   ########.fr       */
+/*   Updated: 2022/05/12 22:05:28 by msotelo-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "pipex_bonus.h"
@@ -42,9 +42,11 @@ char	*find_path(char *cmd, char **envp)
 void	execute(char *cmd, char **envp, t_data *data)
 {
 	int		i;
+	int		j;
 	char	**cmd_exec;
 
 	i = 0;
+	j = 0;
 	cmd_exec = ft_split(cmd, ' ');
 	data->path = find_path(cmd_exec[0], envp);
 	if (data->path == NULL)
@@ -53,9 +55,10 @@ void	execute(char *cmd, char **envp, t_data *data)
 		exit(EXIT_FAILURE);
 	}
 	i = execve(data->path, cmd_exec, envp);
-	while (cmd_exec[i])
+	while (cmd_exec[j])
 	{
-		free(cmd_exec[i]);
+		free(cmd_exec[j]);
+		j++;
 	}
 	free(cmd_exec);
 	if (i == -1)
@@ -63,4 +66,5 @@ void	execute(char *cmd, char **envp, t_data *data)
 		perror("Execution failed");
 		exit(EXIT_FAILURE);
 	}
+	return ;
 }

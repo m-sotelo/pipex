@@ -1,72 +1,93 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex_bonus.c                                      :+:      :+:    :+:   */
+/*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: msotelo- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 15:07:51 by msotelo-          #+#    #+#             */
-/*   Updated: 2022/03/18 17:59:04 by msotelo-         ###   ########.fr       */
+/*   Updated: 2022/05/12 22:05:31 by msotelo-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "pipex_bonus.h"
 #include "libft.h"
 
-void	check_entry(int argc)
+void	fork_pipe_check(int check, int pid)
 {
+	if (check == -1)
+	{
+		perror("Error pipe");
+		exit(EXIT_FAILURE);
+	}
+	else if (pid == -1)
+	{
+		perror("Error fork");
+		exit(EXIT_FAILURE);
+	}
+	return ;
+}
+
+int	**check_entry(int argc, t_data *data)
+{
+	int	**fd;
+	int	i;
+
+	i = 0;
 	if (argc < 5)
 	{
 		perror("Not enough arguments");
 		exit(EXIT_FAILURE);
 	}
+	data->cmds = argc - 3;
+	fd = (int **)malloc(sizeof(int *) * (argc - 4));
+	while (i < argc - 4)
+	{
+		fd[i] = (int *)malloc(sizeof(int) * 2);
+		i++;
+	}
+	return (fd);
 }
 
-void	child_process(char **argv, t_data *data, char **envp, int i)
+int	main(int argc, char **argv, char **envp)
 {
-	if (pipe(data->fd) == -1)
-	{
-		perror("Error pipe");
-		exit(EXIT_FAILURE);
-	}
-	close(data->fd[0]);
-	dup2(data->fd[1], 1);
-	close(data->fd[1]);
-	data->files[0] = open(argv[1], O_RDONLY);
-	if (data->files[0] == -1)
-	{
-		perror("File not found");
-		exit(EXIT_FAILURE);
-	}
-	dup2(data->files[0], 0);
-	execute(argv[i], envp, data);
-	close(data->files[0]);
-	return ;
-}
+	t_data	data;
+	int		i;	
+	int		**fd;
 
-void	father_process(char **argv, t_data *data, char **envp)
-{
-	close(data->fd[1]);
-	dup2(data->fd[0], 0);
-	close(data->fd[0]);
-	data->files[1] = open(argv[data->cmd_num], O_RDWR | O_CREAT | O_TRUNC, 0777);
-	dup2(data->files[1], 1);
-	execute(argv[3], envp, data);
-	close(data->files[1]);
-	return ;
+	i = 0;
+	fd = check_entry(argc, &data);
+	data.count = 0;
+	data.check = pipe(fd[0]);
+	data.pid = fork();
+	fork_pipe_check(data.check, data.pid);
+	if (data.pid == 0)
+	{
+		child_process (argv, &data, envp, fd);
+	}
+	else
+	{
+		waitpid(data.pid, &data.status, 0);
+		father_process (argv, &data, envp, fd);
+	}
 }
 
 /*void	leaks( void ){
 	system( "leaks pipex" );
-}*/
+}
 
 int	main(int argc, char **argv, char **envp)
 {
 	t_data	data;
 	int		i;
+	int		cmds;
 
-	i = 1;
-	data.cmd_num = argc - 1;
-	check_entry(argc);
+	i = 0;
+	cmds = check_entry(argc);
+	if (pipe(data.fd) == -1)
+	{
+		perror("Error pipe");
+		exit(EXIT_FAILURE);
+	}
 	data.pid = fork();
 	if (data.pid == -1)
 	{
@@ -74,11 +95,10 @@ int	main(int argc, char **argv, char **envp)
 		exit(EXIT_FAILURE);
 	}
 	else if (data.pid == 0)
-		while(i++ < (data.cmd_num - 1))
-			child_process (argv, &data, envp, i);
+		child_process (argv, &data, envp, cmds);
 	else
 	{
 		waitpid (data.pid, &data.status, 0);
-		father_process (argv, &data, envp);
+		father_process (argv, &data, envp, cmds);
 	}
-}
+}*/
