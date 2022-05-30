@@ -6,29 +6,57 @@
 /*   By: msotelo- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/09 12:56:15 by msotelo-          #+#    #+#             */
-/*   Updated: 2022/05/24 23:21:27 by msotelo-         ###   ########.fr       */
+/*   Updated: 2022/05/30 14:31:05 by msotelo-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "pipex.h"
+#include "pipex_bonus.h"
 #include "libft.h"
 
-void	check_envp(char *cmd, char **envp)
+void	free_path(char **posible_paths)
 {
-	char	**cmd_exec;
+	int	i;
+
+	i = 0;
+	while (posible_paths[i])
+	{
+		free(posible_paths[i]);
+		i++;
+	}
+	free(posible_paths);
+	return ;
+}
+
+void	free_cmd(t_data *data)
+{
+	int	i;
+
+	i = 0;
+	while (data->cmd_exec[i])
+	{
+		free(data->cmd_exec[i]);
+		i++;
+	}
+	free(data->cmd_exec);
+	free(data->path);
+	return ;
+}
+
+void	check_envp(char *cmd, char **envp, t_data *data)
+{
 	int		j;
 
 	j = 0;
-	cmd_exec = ft_split(cmd, ' ');
-	if (access(cmd_exec[0], F_OK) == 0)
+	data->cmd_exec = ft_split(cmd, ' ');
+	if (access(data->cmd_exec[0], F_OK) == 0)
 	{
-		execve(cmd_exec[0], cmd_exec, envp);
+		execve(data->cmd_exec[0], data->cmd_exec, envp);
 	}
-	while (cmd_exec[j])
+	while (data->cmd_exec[j])
 	{
-		free(cmd_exec[j]);
+		free(data->cmd_exec[j]);
 		j++;
 	}
-	free(cmd_exec);
+	free(data->cmd_exec);
 	return ;
 }
 
@@ -48,40 +76,36 @@ char	*find_path(char *cmd, char **envp)
 		path = ft_strjoin(posible_paths[i], "/");
 		path = ft_strjoin(path, cmd);
 		if (access(path, F_OK) == 0)
+		{
+			free_path(posible_paths);
 			return (path);
+		}
 		free(path);
 		i++;
 	}
-	i = -1;
-	while (posible_paths[i++])
-		free(posible_paths[i]);
-	free(posible_paths);
+	free_path(posible_paths);
 	return (NULL);
 }
 
 void	execute(char *cmd, char **envp, t_data *data)
 {
-	int		i;
-	char	**cmd_exec;
+	int		j;
 
-	i = 0;
-	check_envp(cmd, envp);
-	cmd_exec = ft_split(cmd, ' ');
-	data->path = find_path(cmd_exec[0], envp);
+	j = 0;
+	check_envp(cmd, envp, data);
+	data->cmd_exec = ft_split(cmd, ' ');
+	data->path = find_path(data->cmd_exec[0], envp);
 	if (data->path == NULL)
 	{
+		free_cmd(data);
 		perror("Command not found");
 		exit(EXIT_FAILURE);
 	}
-	i = execve(data->path, cmd_exec, envp);
-	while (cmd_exec[i])
+	if (execve(data->path, data->cmd_exec, envp) == -1)
 	{
-		free(cmd_exec[i]);
-	}
-	free(cmd_exec);
-	if (i == -1)
-	{
+		free_cmd(data);
 		perror("Execution failed");
 		exit(EXIT_FAILURE);
 	}
+	return ;
 }

@@ -6,11 +6,11 @@
 /*   By: msotelo- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/18 14:04:22 by msotelo-          #+#    #+#             */
-/*   Updated: 2022/05/23 19:29:33 by msotelo-         ###   ########.fr       */
+/*   Updated: 2022/05/30 14:31:13 by msotelo-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#ifndef PIPEX_H
-# define PIPEX_H
+#ifndef PIPEX_BONUS_H
+# define PIPEX_BONUS_H
 # include <unistd.h>
 # include <stdio.h>
 # include <stdlib.h>
@@ -19,17 +19,21 @@
 typedef struct s_data
 {
 	int		check;
-	int		fd[2];
-	int		files[2];
 	int		pid;
 	int		status;
-	char	*res;
-	char	*buf;
+	int		cmds;
+	int		count;
+	int		files[2];
+	int		fd[2];
 	char	*path;
+	char	**cmd_exec;
 }			t_data;
 
-void	check_entry(int argc);
-void	child_process(char **argv, t_data *data, char **envp);
+void	free_cmd(t_data *data);
+void	check_envp(char *cmd, char **envp, t_data *data);
+void	fork_pipe_check(int check, int pid);
+void	check_entry(int argc, t_data *data);
+void	child_process(char **argv, t_data *data, char **envp, int i);
 void	father_process(char **argv, t_data *data, char **envp);
 void	free_data(t_data *data, int i);
 void	close_data(t_data *data, int i);
