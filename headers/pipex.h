@@ -6,7 +6,7 @@
 /*   By: msotelo- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/18 14:04:22 by msotelo-          #+#    #+#             */
-/*   Updated: 2022/05/23 19:29:33 by msotelo-         ###   ########.fr       */
+/*   Updated: 2022/11/17 15:15:58 by msotelo-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #ifndef PIPEX_H
@@ -28,6 +28,7 @@ typedef struct s_data
 	char	*path;
 }			t_data;
 
+void	ft_error(int i);
 void	check_entry(int argc);
 void	child_process(char **argv, t_data *data, char **envp);
 void	father_process(char **argv, t_data *data, char **envp);

@@ -6,11 +6,22 @@
 /*   By: msotelo- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 15:07:51 by msotelo-          #+#    #+#             */
-/*   Updated: 2022/05/24 23:22:26 by msotelo-         ###   ########.fr       */
+/*   Updated: 2022/11/17 15:19:34 by msotelo-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "pipex.h"
 #include "libft.h"
+
+void	ft_error(int i)
+{
+	if (i == 0)
+		perror("Error env");
+	else if (i == 1)
+		perror("Error pipe");
+	else if (i == 2)
+		perror("Error fork");
+	exit(EXIT_FAILURE);
+}
 
 void	check_entry(int argc)
 {
@@ -66,17 +77,13 @@ int	main(int argc, char **argv, char **envp)
 
 	i = 0;
 	check_entry(argc);
+	if (*envp == NULL)
+		ft_error(0);
 	if (pipe(data.fd) == -1)
-	{
-		perror("Error pipe");
-		exit(EXIT_FAILURE);
-	}
+		ft_error(1);
 	data.pid = fork();
 	if (data.pid == -1)
-	{
-		perror("Error fork");
-		exit(EXIT_FAILURE);
-	}
+		ft_error(2);
 	else if (data.pid == 0)
 		child_process (argv, &data, envp);
 	else

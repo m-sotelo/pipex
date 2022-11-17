@@ -6,7 +6,7 @@
 /*   By: msotelo- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/09 12:56:15 by msotelo-          #+#    #+#             */
-/*   Updated: 2022/05/24 23:21:27 by msotelo-         ###   ########.fr       */
+/*   Updated: 2022/11/17 15:19:36 by msotelo-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "pipex.h"
@@ -39,8 +39,10 @@ char	*find_path(char *cmd, char **envp)
 	int		i;
 
 	i = 0;
-	while (ft_strnstr(envp[i], "PATH", 4) == 0)
+	while ((envp[i] != NULL) && (ft_strnstr(envp[i], "PATH", 4) == 0))
 		i++;
+	if (envp[i] == NULL)
+		ft_error(0);
 	posible_paths = ft_split(envp[i] + 5, ':');
 	i = 0;
 	while (posible_paths[i])

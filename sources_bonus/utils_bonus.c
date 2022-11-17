@@ -6,7 +6,7 @@
 /*   By: msotelo- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/09 12:56:15 by msotelo-          #+#    #+#             */
-/*   Updated: 2022/05/30 14:31:05 by msotelo-         ###   ########.fr       */
+/*   Updated: 2022/06/13 20:32:45 by msotelo-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "pipex_bonus.h"
@@ -47,6 +47,8 @@ void	check_envp(char *cmd, char **envp, t_data *data)
 
 	j = 0;
 	data->cmd_exec = ft_split(cmd, ' ');
+	if (data->cmd_exec == NULL)
+		free_cmd(data);
 	if (access(data->cmd_exec[0], F_OK) == 0)
 	{
 		execve(data->cmd_exec[0], data->cmd_exec, envp);
@@ -70,6 +72,8 @@ char	*find_path(char *cmd, char **envp)
 	while (ft_strnstr(envp[i], "PATH", 4) == 0)
 		i++;
 	posible_paths = ft_split(envp[i] + 5, ':');
+	if (posible_paths == NULL)
+		free_path(posible_paths);
 	i = 0;
 	while (posible_paths[i])
 	{	

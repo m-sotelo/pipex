@@ -6,7 +6,7 @@
 /*   By: msotelo- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/17 15:07:51 by msotelo-          #+#    #+#             */
-/*   Updated: 2022/05/30 14:47:42 by msotelo-         ###   ########.fr       */
+/*   Updated: 2022/11/03 08:04:00 by msotelo-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "pipex_bonus.h"
@@ -40,10 +40,24 @@ void	check_entry(int argc, t_data *data)
 	data->cmds = argc - 3;
 }
 
+void	aux_wait(t_data *data, int *pid)
+{
+	int	i;
+
+	i = 0;
+	while (i < data->cmds)
+	{
+		waitpid(pid[i], NULL, 0);
+		i++;
+	}
+	return ;
+}
+
 int	main(int argc, char **argv, char **envp)
 {
 	t_data	data;
 	int		i;
+	int		*pid;
 
 	i = 0;
 	check_entry(argc, &data);
@@ -55,11 +69,15 @@ int	main(int argc, char **argv, char **envp)
 		exit(EXIT_FAILURE);
 	}
 	data.files[1] = open(argv[argc - 1], O_RDWR | O_CREAT | O_TRUNC, 0777);
+	pid = (int *)malloc(sizeof(int) * (argc - 3));
+	if (pid == NULL)
+		free(pid);
 	while (i < data.cmds)
 	{
-		child_process(argv, &data, envp, i);
+		pid[i] = child_process(argv, &data, envp, i);
 		i++;
 	}
+	aux_wait(&data, pid);
 	return (0);
 }
 
